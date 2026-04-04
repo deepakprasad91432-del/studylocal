@@ -1,0 +1,36 @@
+﻿
+> studylocal@0.1.0 build
+> next build --webpack
+
+Γû▓ Next.js 16.1.6 (webpack)
+- Environments: .env.local
+- Experiments (use with caution):
+  ┬╖ serverActions
+
+  Creating an optimized production build ...
+ Γ£ô (pwa) Compiling for server...
+ Γ£ô (pwa) Compiling for server...
+ Γ£ô (pwa) Compiling for client (static)...
+ Γùï (pwa) Service worker: C:\studylocal\frontend\public\sw.js
+ Γùï (pwa)   URL: /sw.js
+ Γùï (pwa)   Scope: /
+Γ£ô Compiled successfully in 12.8s
+  Running TypeScript ...
+node.exe : Failed to compile.
+At C:\Program Files\nodejs\npm.ps1:29 char:3
++   & $NODE_EXE $NPM_CLI_JS $args
++   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecifi    
+ed: (Failed to compile.:String) [],     
+RemoteException
+    + FullyQualifiedErrorId : NativeComm    
+andError
+ 
+
+Type error: File 'C:/studylocal/frontend/.nex
+t/dev/types/app/layout.ts' not found.
+  The file is in the program because:
+    Root file specified for compilation
+
+Next.js build worker exited with code: 1 and 
+signal: null
