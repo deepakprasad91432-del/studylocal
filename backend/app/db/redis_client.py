@@ -55,6 +55,36 @@ class RedisClient:
             logger.error(f"[Redis] Set error for key {key}: {e}")
             return False
 
+    async def delete(self, key: str):
+        if not self.is_connected or not self.redis:
+            return False
+        try:
+            await self.redis.delete(key)
+            return True
+        except Exception as e:
+            logger.error(f"[Redis] Delete error for key {key}: {e}")
+            return False
+
+    async def delete_pattern(self, pattern: str):
+        """Scan and delete all keys matching a glob pattern (e.g. 'tutor_search:*')"""
+        if not self.is_connected or not self.redis:
+            return 0
+        try:
+            cursor = 0
+            deleted = 0
+            while True:
+                cursor, keys = await self.redis.scan(cursor, match=pattern, count=100)
+                if keys:
+                    await self.redis.delete(*keys)
+                    deleted += len(keys)
+                if cursor == 0:
+                    break
+            logger.info(f"[Redis] Deleted {deleted} keys matching '{pattern}'")
+            return deleted
+        except Exception as e:
+            logger.error(f"[Redis] Delete pattern error for '{pattern}': {e}")
+            return 0
+
     async def close(self):
         # Upstash AsyncRedis uses a session that should be closed
         if self.redis:

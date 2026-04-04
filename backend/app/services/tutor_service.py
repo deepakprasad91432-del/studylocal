@@ -108,8 +108,9 @@ class TutorService:
                 {"$set": clean_data}
             )
             
-            # 4. Invalidate Cache
-            await redis_client.redis.delete(f"tutor_profile:{existing['auth0Id']}")
+            # 4. Invalidate Cache — both the individual profile AND all search/list caches
+            await redis_client.delete(f"tutor_profile:{existing['auth0Id']}")
+            await redis_client.delete_pattern("tutor_search:*")
             
             return {"success": True, "message": "Profile updated successfully."}
         except Exception as e:

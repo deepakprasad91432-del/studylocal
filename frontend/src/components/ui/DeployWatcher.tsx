@@ -7,65 +7,52 @@ const CHECK_INTERVAL_MS = 60_000; // Check every 60 seconds
 
 /**
  * DeployWatcher
- * Silently polls /_next/static/build-manifest.json on every navigation and
- * every 60 seconds. If the build hash changes (i.e., new Vercel deployment),
- * it automatically reloads the page so the client is always on the
- * latest Server Action IDs — preventing the "Server Action not found" error.
+ * Embeds the build ID at compile time via NEXT_PUBLIC_BUILD_ID.
+ * Polls /api/deploy-check every 60s and on navigation/tab-focus.
+ * If the server reports a different build ID, auto-reloads to
+ * prevent "Server Action not found" errors from stale client bundles.
  */
 export default function DeployWatcher() {
-    const buildIdRef = useRef<string | null>(null);
+    const currentBuildId = process.env.NEXT_PUBLIC_BUILD_ID || 'dev';
+    const hasChecked = useRef(false);
     const pathname = usePathname();
 
     const checkForNewDeploy = async () => {
+        // Skip in development or if no build ID is defined
+        if (!process.env.NEXT_PUBLIC_BUILD_ID) return;
         try {
-            // Fetch the build manifest with cache-busting
-            const res = await fetch(`/_next/static/build-manifest.json?ts=${Date.now()}`, {
-                cache: 'no-store',
-            });
+            const res = await fetch(`/api/deploy-check`, { cache: 'no-store' });
             if (!res.ok) return;
-
-            const etag = res.headers.get('etag') || res.headers.get('last-modified');
-            const text = await res.text();
-            // Use a simple hash of the content to detect changes
-            const hash = etag || text.slice(0, 100);
-
-            if (buildIdRef.current === null) {
-                // First load — store current hash
-                buildIdRef.current = hash;
-            } else if (buildIdRef.current !== hash) {
-                // Hash changed — new deployment detected!
+            const data = await res.json();
+            if (data.buildId && data.buildId !== currentBuildId) {
                 console.info('[DeployWatcher] New deployment detected. Reloading...');
                 window.location.reload();
             }
+            hasChecked.current = true;
         } catch {
-            // Silent fail — network issues shouldn't crash the app
+            // Silent fail
         }
     };
 
-    // Check on every route change
     useEffect(() => {
         checkForNewDeploy();
     // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [pathname]);
 
-    // Also check on a timer
     useEffect(() => {
         const timer = setInterval(checkForNewDeploy, CHECK_INTERVAL_MS);
         return () => clearInterval(timer);
     // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
-    // Also check when user returns to the tab (very effective)
     useEffect(() => {
-        const onVisibilityChange = () => {
-            if (document.visibilityState === 'visible') {
-                checkForNewDeploy();
-            }
+        const onFocus = () => {
+            if (document.visibilityState === 'visible') checkForNewDeploy();
         };
-        document.addEventListener('visibilitychange', onVisibilityChange);
-        return () => document.removeEventListener('visibilitychange', onVisibilityChange);
+        document.addEventListener('visibilitychange', onFocus);
+        return () => document.removeEventListener('visibilitychange', onFocus);
     // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
-    return null; // Renders nothing
+    return null;
 }

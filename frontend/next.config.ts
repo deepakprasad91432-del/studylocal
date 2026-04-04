@@ -100,6 +100,10 @@ const nextConfig: NextConfig = {
     }
     return config;
   },
+  // Inject Vercel's git commit SHA as the public build ID for DeployWatcher
+  env: {
+    NEXT_PUBLIC_BUILD_ID: process.env.VERCEL_GIT_COMMIT_SHA || 'local',
+  },
 };
 
 export default withPWA(nextConfig);
