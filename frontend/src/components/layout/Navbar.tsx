@@ -7,12 +7,14 @@ import { Menu, X, Download, User as UserIcon, LogOut, MessageCircle, AlertCircle
 import { useState, useEffect, useCallback } from 'react';
 import Image from 'next/image';
 import { api } from '@/lib/api-client';
+import { useLoading } from '@/hooks/useLoading';
 
 export default function Navbar() {
     const { user, isLoading, logout } = useAuth0();
     const [isOpen, setIsOpen] = useState(false);
     const [deferredPrompt, setDeferredPrompt] = useState<any>(null);
     const [unreadCount, setUnreadCount] = useState(0);
+    const { setLoading } = useLoading();
     const BACKEND_URL = (process.env.NEXT_PUBLIC_BACKEND_URL || "http://localhost:8000").replace(/\/$/, "");
     const pathname = usePathname();
 
@@ -57,6 +59,13 @@ export default function Navbar() {
             eventSource.close();
         };
     }, [user]);
+
+    const handleLogout = () => {
+        if (window.confirm('Are you sure you want to log out?')) {
+            setLoading(true, 'Logging you out...');
+            window.location.href = '/api/auth/logout';
+        }
+    };
 
     const handleInstallClick = async () => {
         if (deferredPrompt) {
@@ -128,9 +137,9 @@ export default function Navbar() {
                                             <UserIcon className="h-4 w-4" />
                                         </div>
                                     )}
-                                    <Link href="/auth/logout" className="text-gray-400 hover:text-red-500 transition">
+                                    <button onClick={handleLogout} className="text-gray-400 hover:text-red-500 transition" title="Logout">
                                         <LogOut className="h-4 w-4" />
-                                    </Link>
+                                    </button>
                                 </div>
                             </div>
                         )}
@@ -190,12 +199,13 @@ export default function Navbar() {
                             </Link>
                         )}
                         {!isLoading && user && (
-                            <Link href="/auth/logout"
+                            <button
+                                onClick={handleLogout}
                                 className="w-full text-left flex items-center gap-2 px-3 py-2 text-base font-medium text-red-600 hover:bg-red-50 rounded-md"
                             >
                                 <LogOut className="w-5 h-5" />
                                 Logout
-                            </Link>
+                            </button>
                         )}
                     </div>
                 </div>

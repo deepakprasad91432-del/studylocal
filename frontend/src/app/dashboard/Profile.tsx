@@ -4,6 +4,7 @@ import Image from 'next/image';
 import { User, LogOut } from 'lucide-react';
 import { useUser } from "@auth0/nextjs-auth0/client";
 import { getUser } from '@/lib/actions/user';
+import { useRouter } from 'next/navigation';
 
 
 interface ProfileProps {
@@ -28,6 +29,14 @@ export default function Profile() {
         };
         if (user) fetchUser();
     }, [user]);
+
+    const router = useRouter();
+
+    const handleLogout = () => {
+        if (window.confirm('Are you sure you want to log out?')) {
+            window.location.href = '/api/auth/logout?returnTo=/';
+        }
+    };
 
     const displayName = dbUser?.fullName || user?.name || 'Welcome!';
     const displayImage = dbUser?.photoUrl || user?.picture;
@@ -70,13 +79,13 @@ export default function Profile() {
                 </div>
 
                 <div className="mt-8 pt-6 border-t border-gray-100">
-                    <a
-                        href="/api/auth/logout"
+                    <button
+                        onClick={handleLogout}
                         className="inline-flex items-center justify-center w-full px-4 py-2 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 transition-colors"
                     >
                         <LogOut className="mr-2 h-4 w-4" />
                         Log Out
-                    </a>
+                    </button>
                 </div>
             </div>
         </div>
