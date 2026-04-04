@@ -22,11 +22,24 @@ export async function syncUser(userData: any) {
 }
 
 export async function updateUser(auth0Id: string, data: any) {
+    if (!auth0Id) {
+        return { success: false, message: 'Auth0 ID is required' };
+    }
+    
     try {
-        return await api.patch(`/user/${auth0Id}`, data);
-    } catch (err) {
-        console.error('[User Update] Failed to update user profile:', err);
-        throw err;
+        const result = await api.patch(`/user/${auth0Id}`, data);
+        return { success: true, data: result };
+    } catch (err: any) {
+        console.error('[User Update] Server Action Error:', {
+            auth0Id,
+            error: err.message,
+            stack: err.stack,
+            backendUrl: process.env.NEXT_PUBLIC_BACKEND_URL
+        });
+        return { 
+            success: false, 
+            message: err.message || 'Failed to update user profile. Check backend connectivity.' 
+        };
     }
 }
 

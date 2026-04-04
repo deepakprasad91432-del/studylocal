@@ -89,13 +89,18 @@ export default function OnboardingModal() {
         setIsSubmitting(true);
         setLoading(true);
         try {
-            await updateUser(user!.sub!, {
+            const result = await updateUser(user!.sub!, {
                 email: user!.email!,
                 fullName: fullName,
                 photoUrl: photoUrl || user!.picture || undefined,
                 role: role,
                 isProfileComplete: true
             });
+
+            if (!result.success) {
+                toast.error(result.message || "Failed to save profile. Check connection.");
+                return;
+            }
 
             toast.success("Welcome to StudyLocal!");
             setIsOpen(false);
@@ -108,9 +113,9 @@ export default function OnboardingModal() {
                 window.location.reload();
             }
 
-        } catch (error) {
+        } catch (error: any) {
             console.error(error);
-            toast.error("Failed to save profile");
+            toast.error(error.message || "An unexpected error occurred.");
         } finally {
             setIsSubmitting(false);
             setLoading(false);
