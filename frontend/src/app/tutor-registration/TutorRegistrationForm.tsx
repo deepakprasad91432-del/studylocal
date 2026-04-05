@@ -13,7 +13,7 @@ import SubjectInput from './SubjectInput';
 export default function TutorRegistrationForm({ user }: { user: any }) {
     const [serverError, setServerError] = useState<string | null>(null);
     const [isSubmitting, setIsSubmitting] = useState(false);
-    const [preview, setPreview] = useState<string | null>(null);
+    const [preview, setPreview] = useState<string | null>(user?.picture || null);
     const [selectedFile, setSelectedFile] = useState<File | null>(null);
     const router = useRouter();
 
@@ -28,6 +28,7 @@ export default function TutorRegistrationForm({ user }: { user: any }) {
         defaultValues: {
             fullName: user?.name || '',
             email: user?.email || '',
+            photo: user?.picture ? 'valid' : '',
         } as any,
     });
 
@@ -59,13 +60,13 @@ export default function TutorRegistrationForm({ user }: { user: any }) {
         setServerError(null);
 
         try {
-            if (!selectedFile) {
+            if (!selectedFile && !user?.picture) {
                 setServerError('Please upload a profile photo.');
                 setIsSubmitting(false);
                 return;
             }
 
-            const photoUrl = await uploadToCloudinary(selectedFile);
+            const photoUrl = selectedFile ? await uploadToCloudinary(selectedFile) : user.picture;
 
             const formData = new FormData();
             Object.entries(data).forEach(([key, value]) => {
@@ -108,12 +109,12 @@ export default function TutorRegistrationForm({ user }: { user: any }) {
                 className="space-y-10 bg-white rounded-2xl sm:rounded-3xl sm:border sm:shadow-sm p-5 sm:p-8"
             >
                 {/* Header */}
-                <div>
-                    <h1 className="text-xl font-semibold text-gray-900">
+                <div className="text-center sm:text-left mb-8 pb-6 border-b border-gray-100">
+                    <h1 className="text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-gray-900 to-gray-600 tracking-tight">
                         Tutor Registration
                     </h1>
-                    <p className="text-sm text-gray-500 mt-1">
-                        Fill in your details to start getting students
+                    <p className="text-sm text-gray-500 mt-2">
+                        Complete your profile to start receiving student inquiries.
                     </p>
                 </div>
 
@@ -133,10 +134,11 @@ export default function TutorRegistrationForm({ user }: { user: any }) {
                             )}
                         </div>
 
-                        <label className="flex-1">
-                            <span className="inline-block rounded-full bg-brand-50 px-4 py-2 text-sm font-semibold text-brand-700">
+                        <label className="flex-1 cursor-pointer group">
+                            <div className="inline-flex items-center justify-center rounded-xl bg-indigo-50 border border-indigo-100 px-5 py-3 text-sm font-semibold text-indigo-600 transition-all duration-300 hover:bg-indigo-600 hover:text-white shadow-sm hover:shadow-md">
+                                <Upload className="mr-2 h-4 w-4" />
                                 Choose Photo
-                            </span>
+                            </div>
                             <input
                                 type="file"
                                 accept="image/*"
@@ -283,8 +285,8 @@ export default function TutorRegistrationForm({ user }: { user: any }) {
                 </section>
 
                 {serverError && (
-                    <div className="rounded-xl bg-red-50 border border-red-200 px-4 py-3 text-sm text-red-700">
-                        {serverError}
+                    <div className="rounded-xl bg-red-50/50 backdrop-blur-sm border border-red-200 px-5 py-4 text-sm text-red-700 font-medium flex items-center shadow-sm animate-in fade-in zoom-in duration-300">
+                        <span className="mr-2">⚠️</span> {serverError}
                     </div>
                 )}
                 <div className="fixed bottom-0 left-0 right-0 bg-white border-t px-4 py-3 sm:static sm:border-0 sm:p-0">
@@ -298,17 +300,19 @@ export default function TutorRegistrationForm({ user }: { user: any }) {
       py-4
       text-lg
       font-semibold
-      bg-green-300
-      hover:bg-green-500
+      text-white
+      bg-gradient-to-r from-indigo-600 to-indigo-700
+      hover:from-indigo-500 hover:to-indigo-600
+      shadow-lg hover:shadow-indigo-500/25
       active:scale-[0.98]
-      transition
-      disabled:opacity-50
+      transition-all duration-200
+      disabled:opacity-70 disabled:cursor-not-allowed
     "
                     >
                         {isSubmitting ? (
                             <span className="flex items-center justify-center gap-2">
                                 <Loader2 className="h-5 w-5 animate-spin" />
-                                Submitting…
+                                Submitting Application…
                             </span>
                         ) : (
                             'Submit Application'

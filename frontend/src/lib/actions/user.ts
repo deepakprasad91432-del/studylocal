@@ -6,7 +6,7 @@ import { api } from '@/lib/api-client';
 export async function getUser(auth0Id: string) {
     if (!auth0Id) return null;
     try {
-        return await api.get(`/user/${auth0Id}`);
+        return await api.get(`/user/${encodeURIComponent(auth0Id)}`);
     } catch {
         return null;
     }
@@ -27,7 +27,7 @@ export async function updateUser(auth0Id: string, data: any) {
     }
     
     try {
-        const result = await api.patch(`/user/${auth0Id}`, data);
+        const result = await api.patch(`/user/${encodeURIComponent(auth0Id)}`, data);
         return { success: true, data: result };
     } catch (err: any) {
         console.error('[User Update] Server Action Error:', {

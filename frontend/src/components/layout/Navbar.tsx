@@ -34,7 +34,7 @@ export default function Navbar() {
 
         // Use Server-Sent Events for real-time unread count
         const BACKEND_URL = (process.env.NEXT_PUBLIC_BACKEND_URL || "http://localhost:8000").replace(/\/$/, "");
-        const eventSource = new EventSource(`${BACKEND_URL}/api/v1/chat/stream?x_user_id=${user.sub}`);
+        const eventSource = new EventSource(`${BACKEND_URL}/api/v1/chat/stream?x_user_id=${encodeURIComponent(user.sub)}`);
 
         eventSource.addEventListener('initial-count', (e: any) => {
             const data = JSON.parse(e.data);

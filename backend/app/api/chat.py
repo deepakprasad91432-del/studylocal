@@ -34,7 +34,7 @@ async def chat_notification_stream(
         }
 
         # 2. Subscribe to NotificationManager
-        async for message in notification_manager.subscribe(x_user_id):
+        async for message in notification_manager.subscribe(effective_user_id):
             # Check if client disconnected
             if await request.is_disconnected():
                 break

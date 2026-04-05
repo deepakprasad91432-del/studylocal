@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import { useUser } from '@auth0/nextjs-auth0/client';
 import { toast } from 'react-toastify';
 import { User, GraduationCap, School, Camera, Upload, Loader2 } from 'lucide-react';
-import { updateUser, getUser } from '@/lib/actions/user';
+import { updateUser, getUser, syncUser } from '@/lib/actions/user';
 import Image from 'next/image';
 import { useLoading } from '@/context/LoadingContext';
 
@@ -22,9 +22,21 @@ export default function OnboardingModal() {
     useEffect(() => {
         const checkUser = async () => {
             if (user?.sub) {
+                // Step 1: Sync user to DB on every login.
+                // This is idempotent (upsert) — safe to call every time.
+                // Without this, new Google OAuth users have no DB document,
+                // causing getUser to always return null → infinite onboarding loop.
+                await syncUser({
+                    sub: user.sub,
+                    email: user.email,
+                    name: user.name,
+                    picture: user.picture,
+                });
+
+                // Step 2: Now check if the profile is complete
                 const dbUser = await getUser(user.sub);
 
-                // If user doesn't exist or profile not complete, open modal
+                // If profile not complete, open modal
                 if (!dbUser || !dbUser.isProfileComplete) {
                     setIsOpen(true);
                     if (user.name) setFullName(user.name);
