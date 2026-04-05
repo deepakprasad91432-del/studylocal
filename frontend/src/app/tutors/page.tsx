@@ -3,8 +3,6 @@ import TutorsList from './TutorsList';
 import { Metadata } from 'next';
 import { Suspense } from 'react';
 
-// ISR: Revalidate every 30 seconds so approved tutors appear without a full re-deploy.
-// The first request after 30s triggers a background re-fetch; users never see a loading state.
 export const revalidate = 30;
 
 export async function generateMetadata(props: {
@@ -22,11 +20,20 @@ export async function generateMetadata(props: {
                 ? `Tutors in ${area} | StudyLocal`
                 : 'Find Tutors Nearby | StudyLocal';
 
+    const canonical = area 
+        ? `https://studylocal.vercel.app/tutors?area=${encodeURIComponent(area)}`
+        : `https://studylocal.vercel.app/tutors`;
+
     return {
         title,
         description: `Find the best local ${subject || ''} tutors in ${area || 'your neighbourhood'}. Verified profiles, no commission, direct contact.`,
+        alternates: {
+            canonical,
+        },
     };
 }
+
+
 
 async function TutorsFetcher(props: {
     subject: string;

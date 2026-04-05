@@ -4,19 +4,19 @@ import './globals.css';
 import Providers from '@/components/providers';
 import Navbar from '@/components/layout/Navbar';
 import Footer from '@/components/layout/Footer';
+import NextTopLoader from 'nextjs-toploader';
 
 const inter = Inter({
   subsets: ['latin'],
   variable: '--font-inter',
 });
 
-// ── Viewport (must be separate from metadata in Next 13+) ──────────────────
 export const viewport: Viewport = {
   width: 'device-width',
   initialScale: 1,
-  maximumScale: 1,       // prevent auto-zoom on input focus (mobile)
+  maximumScale: 1,
   userScalable: false,
-  interactiveWidget: 'resizes-content', // prevent layout shift from soft keyboard
+  interactiveWidget: 'resizes-content',
   themeColor: '#16a34a',
 };
 
@@ -42,6 +42,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={`${inter.variable} min-h-[100dvh]`}>
+        <NextTopLoader color="#16a34a" showSpinner={false} />
         <Providers>
           <div className="flex min-h-[100dvh] flex-col">
             <Navbar />

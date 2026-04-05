@@ -50,8 +50,41 @@ export default async function TutorDetailPage(props: Props) {
         }
     }
 
+    const structuredData = {
+        "@context": "https://schema.org",
+        "@type": "ProfessionalService",
+        "name": tutor.fullName,
+        "description": tutor.bio,
+        "image": tutor.photoUrl || "https://studylocal.vercel.app/logo.png",
+        "address": {
+            "@type": "PostalAddress",
+            "addressLocality": tutor.area,
+            "addressRegion": "West Bengal", // Assuming based on context, or keep generic
+            "addressCountry": "IN"
+        },
+        "priceRange": `₹${tutor.monthlyFee} - ₹${tutor.monthlyFee * 2}`,
+        "knowsAbout": tutor.subjects,
+        "hasOfferCatalog": {
+            "@type": "OfferCatalog",
+            "name": "Tutoring Services",
+            "itemListElement": [
+                {
+                    "@type": "Offer",
+                    "itemOffered": {
+                        "@type": "Service",
+                        "name": `${tutor.classRange} Tutoring`
+                    }
+                }
+            ]
+        }
+    };
+
     return (
         <div className="min-h-screen bg-gray-50 py-8">
+            <script
+                type="application/ld+json"
+                dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }}
+            />
             <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
                 <div className="bg-white rounded-xl shadow-sm overflow-hidden border border-gray-100">
 
