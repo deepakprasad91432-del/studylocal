@@ -86,7 +86,7 @@ export async function getTutors(filters: any = {}) {
         if (filters.subject) query.append('subject', filters.subject);
         if (filters.area) query.append('area', filters.area);
         
-        const res = await api.get(`/tutor/?${query.toString()}`);
+        const res = await api.get(`/tutor/?${query.toString()}`, { cache: 'no-store' });
         return res.tutors || [];
     } catch (error: any) {
         console.error('[Tutor Migration] Get Tutors Error:', error);

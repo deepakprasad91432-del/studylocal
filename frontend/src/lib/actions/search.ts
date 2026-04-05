@@ -27,8 +27,10 @@ export async function getTutors(
             ...(filters.area && { area: filters.area }),
         });
 
-        // Call FastAPI instead of direct MongoDB
-        return await api.get(`/tutor?${queryParams.toString()}`);
+        // Call FastAPI directly with trailing slash to prevent 307 redirects
+        // Use cache: no-store or next: { revalidate: 0 } inside api.get options 
+        // to bypass sticky Vercel Data Cache. We rely on the page ISR instead.
+        return await api.get(`/tutor/?${queryParams.toString()}`, { cache: 'no-store' });
     } catch (error) {
         console.error('[Search Migration] Failed to fetch tutors:', error);
         return {

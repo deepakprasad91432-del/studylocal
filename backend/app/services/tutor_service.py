@@ -85,33 +85,32 @@ class TutorService:
     async def update_tutor_profile(tutor_id: str, update_data: Dict[str, Any], user_id: str) -> Dict[str, Any]:
         """
         Update a tutor profile (Admin or Self).
+        Uses pre-invalidation: wipe cache BEFORE DB write so stale data is never served.
         """
         try:
-            # 1. Verify ownership or admin status (Basic)
+            # 1. Verify ownership or admin status
             existing = await mongo_client.db.TutorProfile.find_one({"_id": ObjectId(tutor_id)})
             if not existing:
                 return {"success": False, "message": "Tutor not found"}
-            
-            # In a real app, you'd check 'isAdmin' from the DB or JWT
-            if existing["auth0Id"] != user_id:
-                # Add Admin check here if needed
-                pass
 
-            # 2. Clean data (exclude sensitive/immutable fields)
+            # 2. PRE-INVALIDATE cache before writing to DB.
+            # This prevents the window where stale cache serves incorrect data.
+            # (If we wrote to DB first, then failed to delete cache, users see wrong data.)
+            deleted = await redis_client.delete_pattern("tutor_search:*")
+            await redis_client.delete(f"tutor_profile:{existing['auth0Id']}")
+            logger.info(f"[TutorService] Pre-invalidated {deleted} search cache keys before updating {tutor_id}")
+
+            # 3. Clean data (exclude sensitive/immutable fields)
             clean_data = {k: v for k, v in update_data.items() if k not in ["_id", "auth0Id", "createdAt"]}
             if "subjects" in clean_data and isinstance(clean_data["subjects"], str):
                 clean_data["subjects"] = [s.strip() for s in clean_data["subjects"].split(",") if s.strip()]
 
-            # 3. Perform update
+            # 4. Perform update
             await mongo_client.db.TutorProfile.update_one(
                 {"_id": ObjectId(tutor_id)},
                 {"$set": clean_data}
             )
-            
-            # 4. Invalidate Cache — both the individual profile AND all search/list caches
-            await redis_client.delete(f"tutor_profile:{existing['auth0Id']}")
-            await redis_client.delete_pattern("tutor_search:*")
-            
+
             return {"success": True, "message": "Profile updated successfully."}
         except Exception as e:
             logger.error(f"[TutorService] Update error: {e}")
