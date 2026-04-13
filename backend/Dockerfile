@@ -1,12 +1,12 @@
 # Stage 1: Builder
 # We use this stage to install dependencies safely
-FROM python:3.11-slim as builder
+FROM python:3.11-slim AS builder
 
 WORKDIR /app
 
 # Prevent Python from writing .pyc files and buffering stdout/stderr
-ENV PYTHONDONTWRITEBYTECODE 1
-ENV PYTHONUNBUFFERED 1
+ENV PYTHONDONTWRITEBYTECODE=1
+ENV PYTHONUNBUFFERED=1
 
 # Install build dependencies if needed (e.g. for cryptography)
 RUN apt-get update && apt-get install -y --no-install-recommends \
@@ -22,8 +22,8 @@ FROM python:3.11-slim
 
 WORKDIR /app
 
-ENV PYTHONDONTWRITEBYTECODE 1
-ENV PYTHONUNBUFFERED 1
+ENV PYTHONDONTWRITEBYTECODE=1
+ENV PYTHONUNBUFFERED=1
 ENV PATH=/root/.local/bin:$PATH
 
 # Copy only the installed packages from the builder
