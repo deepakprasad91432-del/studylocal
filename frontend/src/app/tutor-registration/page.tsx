@@ -14,14 +14,13 @@ export default function TutorRegistrationPage() {
     useEffect(() => {
         if (!isLoading && !user && !isRedirecting) {
             setIsRedirecting(true);
-            toast.warn('Please login first to become a tutor');
-            
-            // Short delay to allow toast to be seen
-            const timer = setTimeout(() => {
-                router.push('/api/auth/login?returnTo=/tutor-registration');
-            }, 1500);
-            
-            return () => clearTimeout(timer);
+            toast.info("Please login to register as a tutor");
+
+            // Build absolute returnTo URL so Auth0 accepts it in production
+            const returnTo = typeof window !== 'undefined'
+                ? `${window.location.origin}/tutor-registration`
+                : `${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/tutor-registration`;
+            window.location.href = `/auth/login`;
         }
     }, [user, isLoading, router, isRedirecting]);
 

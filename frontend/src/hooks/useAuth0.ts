@@ -11,7 +11,7 @@ export function useAuth0() {
   const loginWithRedirect = async (options?: { appState?: { returnTo?: string } }) => {
     // Use explicit returnTo > current pathname > fallback to '/'
     const returnTo = options?.appState?.returnTo ?? pathname ?? '/';
-    const loginUrl = `/api/auth/login?returnTo=${encodeURIComponent(returnTo)}`;
+    const loginUrl = `auth/login`;
     window.location.assign(loginUrl);
   };
 

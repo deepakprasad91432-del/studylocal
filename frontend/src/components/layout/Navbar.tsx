@@ -60,11 +60,11 @@ export default function Navbar() {
         };
     }, [user]);
 
-    const handleLogout = () => {
-        if (window.confirm('Are you sure you want to log out?')) {
-            setLoading(true, 'Logging you out...');
-            window.location.href = '/api/auth/logout';
-        }
+    const getLogoutUrl = () => {
+        const returnTo = typeof window !== 'undefined'
+            ? `${window.location.origin}/`
+            : (process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000') + '/';
+        return `/auth/logout?returnTo=${encodeURIComponent(returnTo)}`;
     };
 
     const handleInstallClick = async () => {
@@ -137,9 +137,13 @@ export default function Navbar() {
                                             <UserIcon className="h-4 w-4" />
                                         </div>
                                     )}
-                                    <button onClick={handleLogout} className="text-gray-400 hover:text-red-500 transition" title="Logout">
+                                <a
+                                        href={getLogoutUrl()}
+                                        className="text-gray-400 hover:text-red-500 transition"
+                                        title="Logout"
+                                    >
                                         <LogOut className="h-4 w-4" />
-                                    </button>
+                                    </a>
                                 </div>
                             </div>
                         )}
@@ -199,13 +203,13 @@ export default function Navbar() {
                             </Link>
                         )}
                         {!isLoading && user && (
-                            <button
-                                onClick={handleLogout}
-                                className="w-full text-left flex items-center gap-2 px-3 py-2 text-base font-medium text-red-600 hover:bg-red-50 rounded-md"
+                            <a
+                                href={getLogoutUrl()}
+                                className="w-full flex items-center gap-2 px-3 py-2 text-base font-medium text-red-600 hover:bg-red-50 rounded-md"
                             >
                                 <LogOut className="w-5 h-5" />
                                 Logout
-                            </button>
+                            </a>
                         )}
                     </div>
                 </div>

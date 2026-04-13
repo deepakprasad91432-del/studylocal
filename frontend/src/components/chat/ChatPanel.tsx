@@ -256,7 +256,7 @@ export default function ChatPanel({
                 <div className="rounded-xl bg-white p-6 text-center shadow">
                     <p className="mb-4 text-gray-600">Please log in to chat.</p>
                     <a
-                        href="/api/auth/login"
+                        href="auth/login"
                         className="rounded-full bg-green-600 px-6 py-2 text-white hover:bg-green-700 transition"
                     >
                         Login

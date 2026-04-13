@@ -20,16 +20,16 @@ export default async function ChatListPage() {
                 <div className="text-center">
                     <h1 className="text-2xl font-bold text-gray-900">Please Login</h1>
                     <p className="text-gray-500 mt-2">You need to be logged in to view your messages.</p>
-                    <a href="/api/auth/login" className="mt-4 inline-block bg-brand-600 text-white px-6 py-2 rounded-lg">Login</a>
+                    <a href="/auth/login" className="mt-4 inline-block bg-brand-600 text-white px-6 py-2 rounded-lg">Login</a>
                 </div>
             </div>
         );
     }
 
     const userId = session.user.sub;
-    
+
     await dbConnect();
-    
+
     // Direct DB lookup (bypass cache for critical dashboard list)
     const tutorProfileDoc = await TutorProfile.findOne({ auth0Id: userId }).lean();
     const tutorProfile = tutorProfileDoc ? { ...tutorProfileDoc, _id: tutorProfileDoc._id.toString() } : null;
@@ -220,11 +220,10 @@ export default async function ChatListPage() {
                                             <div className="flex items-center gap-2 truncate pr-2">
                                                 <h3 className="font-semibold text-gray-900 truncate">{chat.name}</h3>
                                                 {chat.roleLabel && (
-                                                    <span className={`text-[10px] uppercase tracking-wider px-1.5 py-0.5 rounded-md font-bold ${
-                                                        chat.roleLabel === 'Tutor' 
-                                                            ? 'bg-blue-50 text-blue-600 border border-blue-100' 
+                                                    <span className={`text-[10px] uppercase tracking-wider px-1.5 py-0.5 rounded-md font-bold ${chat.roleLabel === 'Tutor'
+                                                            ? 'bg-blue-50 text-blue-600 border border-blue-100'
                                                             : 'bg-orange-50 text-orange-600 border border-orange-100'
-                                                    }`}>
+                                                        }`}>
                                                         {chat.roleLabel}
                                                     </span>
                                                 )}

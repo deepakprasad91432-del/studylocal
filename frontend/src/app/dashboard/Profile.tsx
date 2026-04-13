@@ -30,10 +30,11 @@ export default function Profile() {
 
     const router = useRouter();
     // ... same as before ...
-    const handleLogout = () => {
-        if (window.confirm('Are you sure you want to log out?')) {
-            window.location.href = '/api/auth/logout?returnTo=/';
-        }
+    const getLogoutUrl = () => {
+        const returnTo = typeof window !== 'undefined'
+            ? `${window.location.origin}/`
+            : (process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000') + '/';
+        return `/auth/logout?returnTo=${encodeURIComponent(returnTo)}`;
     };
 
     const displayName = dbUser?.fullName || user?.name || 'Welcome!';
@@ -75,13 +76,13 @@ export default function Profile() {
                                     {dbUser?.role || 'Member'}
                                 </div>
                             </div>
-                            <button
-                                onClick={handleLogout}
+                            <a
+                                href={getLogoutUrl()}
                                 className="text-gray-400 hover:text-red-500 transition-colors p-2"
                                 title="Logout"
                             >
                                 <LogOut className="h-5 w-5" />
-                            </button>
+                            </a>
                         </div>
                     </div>
                 </div>

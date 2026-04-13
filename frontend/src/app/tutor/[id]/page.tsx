@@ -233,7 +233,7 @@ export default async function TutorDetailPage(props: Props) {
                                                 Please login to view contact details and connect with this tutor.
                                             </p>
                                             <a
-                                                href={`/api/auth/login?returnTo=/tutor/${tutor._id}`}
+                                                href={`/auth/login`}
                                                 className="block w-full bg-green-600 text-white text-center py-2 rounded-md font-medium hover:bg-green-700 transition"
                                             >
                                                 Login to View
