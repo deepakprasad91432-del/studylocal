@@ -1,0 +1,38 @@
+# Documentation & Scripts (User Requested)
+script.md
+seo_guide.md
+video_script.md
+video*.md
+
+# Node.js
+node_modules/
+.next/
+out/
+build/
+dist/
+.npm
+.eslintcache
+*.log
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+venv/
+.venv/
+env/
+.env
+.ipynb_checkpoints/
+
+# Environment / Secret Files
+.env
+*.local
+.env.production
+.env.development
+
+# OS related
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+*.swp
